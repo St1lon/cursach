@@ -19,6 +19,8 @@ class Node{
     class OneLinkedList{
         Node* head, *tail;
     public:
+        Node* getHead() const { return head; }
+        Node* getTail() const { return tail; }
         OneLinkedList();
         ~OneLinkedList();
         OneLinkedList(OneLinkedList& other);

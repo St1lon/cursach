@@ -35,6 +35,8 @@ int main() {
         string student_id, visit_date, visit_time, new_value;
         OneLinkedList result;
         int count;
+        bool check = false;
+        Node* current;
         Student new_student;
         Visits new_visit;
         
@@ -103,6 +105,19 @@ int main() {
             case 8:
                 cout << "Введите номер телефона студента (ID): ";
                 cin >> student_id;
+                current = list.getHead();
+                while(current != NULL){
+                    Student new_student = current->data;
+                    if(new_student.phone_number == student_id){
+                        check = true;
+                        break;
+                    }
+                    current = current->next;
+                }
+                if(check == false){
+                    cout << "Студента с таким номером не существует";
+                    break;
+                }
                 cout << "\nМеню редактирования:\n";
                 cout << "1. Изменить данные студента\n";
                 cout << "2. Добавить посещение\n";

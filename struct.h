@@ -4,7 +4,16 @@
 #include <string>
 #include <vector>
 using namespace std;
-struct Visits{
+class Person{
+    public:
+    string lastname;
+    string inicial;
+    int date_born; 
+    string phone_number;
+    virtual Person* clone() const = 0;
+};
+class Visits{
+public:
     string date_visit;
     string time_visit;
     string diagnos;
@@ -13,16 +22,15 @@ struct Visits{
     string doctor_inicial;
 };
 
-struct Student{
-string lastname;
-string inicial;
-int date_born; 
-string phone_number;
+class Student : public Person{
+public:
 int join_date;
 string group_name;
 string university;
 string cafedra;
 vector<Visits> visits;
+Person* clone() const override {
+return new Student(*this);
+}
 };
-
 #endif

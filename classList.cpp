@@ -74,6 +74,8 @@ void OneLinkedList::pop_back() {
 }
 
 void OneLinkedList::push_front(Student data) {
+    try{
+    data.validateStudentData();
     Node* newNode = new Node(data);
     if (head == NULL) {
         head = tail = newNode;
@@ -81,13 +83,24 @@ void OneLinkedList::push_front(Student data) {
         newNode->next = head;
         head = newNode;
     }
+} catch(invalid_argument& e){
+    cerr << "Ошибка добавления студента: " << e.what() << endl;
+    throw;
+}
+
 }
 
 void OneLinkedList::push_back(Student data) {
-    Node* node = new Node(data);
-    if(head == NULL) head = node;
-    if(tail != NULL) tail->next = node;
-    tail = node;
+    try {
+        data.validateStudentData();
+        Node* node = new Node(data);
+        if(head == NULL) head = node;
+        if(tail != NULL) tail->next = node;
+        tail = node;
+    } catch (invalid_argument& e) {
+        cerr << "Ошибка добавления студента: " << e.what() << endl;
+        throw;
+    }
 }
 
 OneLinkedList OneLinkedList::searchStudentsDate(string date) {
@@ -236,54 +249,123 @@ void OneLinkedList::load_file(string filename) {
 }
 
 void OneLinkedList::push_backNnodes(int N) {
-    cin.ignore();
-    if (N == 0) return;
+    if (N <= 0) {
+        cerr << "Ошибка: количество студентов должно быть положительным числом." << endl;
+        return;
+    }
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Очистка буфера ввода
 
     for (int i = 0; i < N; i++) {
-        Student obj;
-        Visits visit;
-        int k;
-        string temp_str;
-        int temp_int;
+        cout << "\n=== Ввод данных студента " << i + 1 << " из " << N << " ===" << endl;
+        
+        Student newStudent;
+        Visits newVisit;
+        string input;
+        int intValue;
+        int visitCount = 0;
 
-        cout << "Введите фамилию студента: ";
-        cin >> temp_str; obj.setLastname(temp_str);
-        cout << "Введите инициалы студента: ";
-        cin >> temp_str; obj.setInicial(temp_str);
-        cout << "Введите дату рождения (число): ";
-        cin >> temp_int; obj.setDateBorn(temp_int);
-        cout << "Введите номер телефона: ";
-        cin >> temp_str; obj.setPhoneNumber(temp_str);
-        cout << "Введите дату зачисления (число): ";
-        cin >> temp_int; obj.setJoinDate(temp_int);
-        cout << "Введите название группы: ";
-        cin >> temp_str; obj.setGroupName(temp_str);
-        cout << "Введите университет: ";
-        cin >> temp_str; obj.setUniversity(temp_str);
-        cout << "Введите кафедру: ";
-        cin >> temp_str; obj.setCafedra(temp_str);
+        try {
+            // Ввод и валидация основных данных студента
+            cout << "Фамилия: ";
+            getline(cin, input);
+            if (input.empty()) throw invalid_argument("Фамилия не может быть пустой");
+            newStudent.setLastname(input);
 
-        cout << "Введите количество посещений, которые необходимо ввести: ";
-        cin >> k;
+            cout << "Инициалы: ";
+            getline(cin, input);
+            if (input.empty()) throw invalid_argument("Инициалы не могут быть пустыми");
+            newStudent.setInicial(input);
 
-        for (int j = 0; j < k; j++) {
-            cout << "Введите дату посещения(формат YYYY.MM.DD): ";
-            cin >> temp_str; visit.setDateVisit(temp_str);
-            cout << "Введите время посещения(формат HH.MM): ";
-            cin >> temp_str; visit.setTimeVisit(temp_str);
-            cout << "Введите диагноз: ";
-            cin >> temp_str; visit.setDiagnos(temp_str);
-            cout << "Введите рекомендации: ";
-            cin >> temp_str; visit.setRecomendations(temp_str);
-            cout << "Введите фамилию врача: ";
-            cin >> temp_str; visit.setDoctorLastname(temp_str);
-            cout << "Введите инициалы врача: ";
-            cin >> temp_str; visit.setDoctorInicial(temp_str);
+            cout << "Дата рождения (число): ";
+            if (!(cin >> intValue)) throw invalid_argument("Неверный формат даты рождения");
+            if (intValue <= 0) throw invalid_argument("Дата рождения должна быть положительным числом");
+            newStudent.setDateBorn(intValue);
+            cin.ignore();
 
-            obj.addVisit(visit);
+            cout << "Номер телефона: ";
+            getline(cin, input);
+            if (input.empty()) throw invalid_argument("Номер телефона не может быть пустым");
+            if (input.find_first_not_of("0123456789+()- ") != string::npos) {
+                throw invalid_argument("Номер телефона содержит недопустимые символы");
+            }
+            newStudent.setPhoneNumber(input);
+
+            cout << "Дата зачисления (число): ";
+            if (!(cin >> intValue)) throw invalid_argument("Неверный формат даты зачисления");
+            if (intValue <= 0) throw invalid_argument("Дата зачисления должна быть положительным числом");
+            newStudent.setJoinDate(intValue);
+            cin.ignore();
+            cout << "Группа: ";
+            getline(cin, input);
+            if (input.empty()) throw invalid_argument("Название группы не может быть пустым");
+            newStudent.setGroupName(input);
+            cout << "Университет: ";
+            getline(cin, input);
+            if (input.empty()) throw invalid_argument("Название университета не может быть пустым");
+            newStudent.setUniversity(input);
+            cout << "Кафедра: ";
+            getline(cin, input);
+            if (input.empty()) throw invalid_argument("Название кафедры не может быть пустым");
+            newStudent.setCafedra(input);
+            cout << "Количество посещений: ";
+            if (!(cin >> visitCount)) throw invalid_argument("Неверный формат количества посещений");
+            if (visitCount < 0) throw invalid_argument("Количество посещений не может быть отрицательным");
+            cin.ignore();
+
+            for (int j = 0; j < visitCount; j++) {
+                cout << "\n  Ввод посещения " << j + 1 << " из " << visitCount << endl;
+                
+                cout << "Дата посещения (ГГГГ.ММ.ДД): ";
+                getline(cin, input);
+                if (input.length() != 10 || input[4] != '.' || input[7] != '.') {
+                    throw invalid_argument("Неверный формат даты. Используйте ГГГГ.ММ.ДД");
+                }
+                newVisit.setDateVisit(input);
+
+                cout << "Время посещения (ЧЧ.ММ): ";
+                getline(cin, input);
+                if (input.length() != 5 || input[2] != '.') {
+                    throw invalid_argument("Неверный формат времени. Используйте ЧЧ.ММ");
+                }
+                newVisit.setTimeVisit(input);
+
+                cout << " Диагноз: ";
+                getline(cin, input);
+                if (input.empty()) throw invalid_argument("Диагноз не может быть пустым");
+                newVisit.setDiagnos(input);
+
+                cout << " Рекомендации: ";
+                getline(cin, input);
+                if (input.empty()) throw invalid_argument("Рекомендации не могут быть пустыми");
+                newVisit.setRecomendations(input);
+
+                cout << " Фамилия врача: ";
+                getline(cin, input);
+                if (input.empty()) throw invalid_argument("Фамилия врача не может быть пустой");
+                newVisit.setDoctorLastname(input);
+
+                cout << " Инициалы врача: ";
+                getline(cin, input);
+                if (input.empty()) throw invalid_argument("Инициалы врача не могут быть пустыми");
+                newVisit.setDoctorInicial(input);
+
+                newStudent.addVisit(newVisit);
+            }
+
+            // Добавление валидированного студента в список
+            push_back(newStudent);
+            cout << "Студент успешно добавлен!" << endl;
+
+        } catch (invalid_argument& e) {
+            cerr << "Ошибка ввода данных: " << e.what() << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            i--; // Повторяем ввод для этого студента
+        } catch (exception& e) {
+            cerr << "Неожиданная ошибка: " << e.what() << endl;
+            return;
         }
-
-        push_back(obj);
     }
 }
 
@@ -354,27 +436,39 @@ ostream& operator<<(ostream& os, OneLinkedList list) {
 }
 
 bool OneLinkedList::updateStudentData(string student_id, Student new_data) {
-    Node* current = head;
-    while (current != NULL) {
-        if (current->data.getPhoneNumber() == student_id) { 
-            current->data = new_data;
-            return true;
+    try {
+        new_data.validateStudentData();
+        Node* current = head;
+        while (current != NULL) {
+            if (current->data.getPhoneNumber() == student_id) { 
+                current->data = new_data;
+                return true;
+            }
+            current = current->next;
         }
-        current = current->next;
+        return false;
+    } catch (invalid_argument& e) {
+        cerr << "Ошибка обновления данных студента: " << e.what() << endl;
+        return false;
     }
-    return false;
 }
 
 bool OneLinkedList::addVisitToStudent(string student_id, Visits new_visit) {
-    Node* current = head;
-    while (current != NULL) {
-        if (current->data.getPhoneNumber() == student_id) {
-            current->data.addVisit(new_visit);
-            return true;
+    try {
+        new_visit.validateVisitData();
+        Node* current = head;
+        while (current != NULL) {
+            if (current->data.getPhoneNumber() == student_id) {
+                current->data.addVisit(new_visit);
+                return true;
+            }
+            current = current->next;
         }
-        current = current->next;
+        return false;
+    } catch (invalid_argument& e) {
+        cerr << "Ошибка добавления посещения: " << e.what() << endl;
+        return false;
     }
-    return false;
 }
 
 bool OneLinkedList::removeVisitFromStudent(string student_id, string visit_date, string visit_time) {

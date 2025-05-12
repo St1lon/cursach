@@ -172,10 +172,7 @@ bool DESUtils::decrypt_file(const string& input_file, const string& output_file,
     return true;
 }
 
-// В des_utils.h
 
-
-// В des_utils.cpp
 void DESUtils::generate_random_key(DES_cblock* key) {
     if (!key) {
         throw std::invalid_argument("Key pointer is null");

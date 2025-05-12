@@ -4,33 +4,74 @@
 #include <string>
 #include <vector>
 using namespace std;
-class Person{
-    public:
+
+class Person {
+protected:
     string lastname;
     string inicial;
     int date_born; 
     string phone_number;
+private:
     virtual Person* clone() const = 0;
-};
-class Visits{
 public:
+    const string& getLastname() const { return lastname; }
+    void setLastname(const string& value) { lastname = value; }
+    const string& getInicial() const { return inicial; }
+    void setInicial(const string& value) { inicial = value; }
+    int getDateBorn() const { return date_born; }
+    void setDateBorn(int value) { date_born = value; }
+    const string& getPhoneNumber() const { return phone_number; }
+    void setPhoneNumber(const string& value) { phone_number = value; }
+};
+
+class Visits {
     string date_visit;
     string time_visit;
     string diagnos;
     string recomendations;
     string doctor_lastname;
     string doctor_inicial;
+public:
+    const string& getDateVisit() const { return date_visit; }
+    void setDateVisit(const string& value) { date_visit = value; }
+    const string& getTimeVisit() const { return time_visit; }
+    void setTimeVisit(const string& value) { time_visit = value; }
+    const string& getDiagnos() const { return diagnos; }
+    void setDiagnos(const string& value) { diagnos = value; }
+    const string& getRecomendations() const { return recomendations; }
+    void setRecomendations(const string& value) { recomendations = value; }
+    const string& getDoctorLastname() const { return doctor_lastname; }
+    void setDoctorLastname(const string& value) { doctor_lastname = value; }
+    const string& getDoctorInicial() const { return doctor_inicial; }
+    void setDoctorInicial(const string& value) { doctor_inicial = value; }
 };
 
-class Student : public Person{
+class Student : public Person {
+    int join_date;
+    string group_name;
+    string university;
+    string cafedra;
+    vector<Visits> visits;
 public:
-int join_date;
-string group_name;
-string university;
-string cafedra;
-vector<Visits> visits;
-Person* clone() const override {
-return new Student(*this);
-}
+    int getJoinDate() const { return join_date; }
+    void setJoinDate(int value) { join_date = value; }
+    
+    const string& getGroupName() const { return group_name; }
+    void setGroupName(const string& value) { group_name = value; }
+    
+    const string& getUniversity() const { return university; }
+    void setUniversity(const string& value) { university = value; }
+    
+    const string& getCafedra() const { return cafedra; }
+    void setCafedra(const string& value) { cafedra = value; }
+    
+    const vector<Visits>& getVisits() const { return visits; }
+    vector<Visits>& getVisits() { return visits; }
+    void addVisit(const Visits& visit) { visits.push_back(visit); }
+    void clearVisits() { visits.clear(); }
+    
+    Person* clone() const override {
+        return new Student(*this);
+    }
 };
 #endif

@@ -10,23 +10,25 @@ using namespace std;
 
 Node::Node(Student data) {
     this->data = data;
-    this-> next = NULL;
+    this->next = NULL;
 }
-OneLinkedList::OneLinkedList(){
+
+OneLinkedList::OneLinkedList() {
     this->head = this->tail = NULL;
 }
-OneLinkedList::~OneLinkedList(){
-    while(head != NULL) pop_front();
 
+OneLinkedList::~OneLinkedList() {
+    while(head != NULL) pop_front();
 }
 
-OneLinkedList::OneLinkedList(OneLinkedList& other) : head(NULL), tail(NULL){
+OneLinkedList::OneLinkedList(OneLinkedList& other) : head(NULL), tail(NULL) {
     Node* current = other.head;
-    while(current != NULL){
+    while(current != NULL) {
         push_back(current->data);
         current = current->next;  
     }
 }
+
 OneLinkedList OneLinkedList::operator=(OneLinkedList list) {
     if (this != &list) {
         Node* current = head;
@@ -44,32 +46,33 @@ OneLinkedList OneLinkedList::operator=(OneLinkedList list) {
     }
     return *this;
 }
-void OneLinkedList::pop_front(){
+
+void OneLinkedList::pop_front() {
     if(head == NULL) return;
-    if(head == tail){
+    if(head == tail) {
         delete tail;
         head = tail = NULL;
         return;
     }
-    Node* node;
-    node = head;
-    head = node-> next;
+    Node* node = head;
+    head = node->next;
     delete node;
 }
-void OneLinkedList::pop_back(){
+
+void OneLinkedList::pop_back() {
     if(tail == NULL) return;
-    if(head == tail){
+    if(head == tail) {
         delete tail;
         head = tail = NULL;
         return;
     }
-    Node* node;
-    node = head;
-    for(;node->next != tail; node = node->next);
+    Node* node = head;
+    for(; node->next != tail; node = node->next);
     node->next = NULL;
     delete tail;
     tail = node;
 }
+
 void OneLinkedList::push_front(Student data) {
     Node* newNode = new Node(data);
     if (head == NULL) {
@@ -79,30 +82,29 @@ void OneLinkedList::push_front(Student data) {
         head = newNode;
     }
 }
-void OneLinkedList::push_back(Student data){
+
+void OneLinkedList::push_back(Student data) {
     Node* node = new Node(data);
     if(head == NULL) head = node;
     if(tail != NULL) tail->next = node;
     tail = node;
 }
 
-
 OneLinkedList OneLinkedList::searchStudentsDate(string date) {
     OneLinkedList result;
     Node* current = head;
     
     while (current != NULL) {
-        Student filteredStudent = current->data; // Копируем данные студента
-        filteredStudent.visits.clear(); // Очищаем посещения
+        Student filteredStudent = current->data;
+        filteredStudent.clearVisits();
         
-        // Проверяем все посещения студента
-        for (const Visits& visit : current->data.visits) {
-            if (visit.date_visit == date) 
-                filteredStudent.visits.push_back(visit); // Добавляем только подходящие   
+        for (const Visits& visit : current->data.getVisits()) {
+            if (visit.getDateVisit() == date) {
+                filteredStudent.addVisit(visit);
+            }
         }
         
-        // Если нашли хотя бы одно посещение в диапазоне - добавляем студента в результат
-        if (!filteredStudent.visits.empty()) {
+        if (!filteredStudent.getVisits().empty()) {
             result.push_back(filteredStudent);
         }
         
@@ -111,27 +113,31 @@ OneLinkedList OneLinkedList::searchStudentsDate(string date) {
     
     return result;
 }
-OneLinkedList OneLinkedList::searchStudentsBetweenDate(string start_date, string end_date, string start_time, string end_time, string diagnos_search) {
+
+OneLinkedList OneLinkedList::searchStudentsBetweenDate(string start_date, string end_date, 
+                                                     string start_time, string end_time, 
+                                                     string diagnos_search) {
     OneLinkedList result;
     Node* current = head;
     
     while (current != NULL) {
-        Student filteredStudent = current->data; // Копируем данные студента
-        filteredStudent.visits.clear(); // Очищаем посещения
+        Student filteredStudent = current->data;
+        filteredStudent.clearVisits();
         
-        // Проверяем все посещения студента
-        for (const Visits& visit : current->data.visits) {
-            if (visit.date_visit > start_date && 
-                visit.date_visit < end_date && visit.diagnos == diagnos_search) 
-                filteredStudent.visits.push_back(visit); // Добавляем только подходящие   
-            if(visit.date_visit == start_date || visit.date_visit == end_date){
-                if(visit.time_visit > start_time && visit.time_visit < end_time && visit.diagnos == diagnos_search)
-                    filteredStudent.visits.push_back(visit);
+        for (const Visits& visit : current->data.getVisits()) {
+            if (visit.getDateVisit() > start_date && 
+                visit.getDateVisit() < end_date && visit.getDiagnos() == diagnos_search) {
+                filteredStudent.addVisit(visit);
+            }
+            if(visit.getDateVisit() == start_date || visit.getDateVisit() == end_date) {
+                if(visit.getTimeVisit() > start_time && visit.getTimeVisit() < end_time && 
+                   visit.getDiagnos() == diagnos_search) {
+                    filteredStudent.addVisit(visit);
+                }
             }
         }
         
-        // Если нашли хотя бы одно посещение в диапазоне - добавляем студента в результат
-        if (!filteredStudent.visits.empty()) {
+        if (!filteredStudent.getVisits().empty()) {
             result.push_back(filteredStudent);
         }
         
@@ -140,24 +146,30 @@ OneLinkedList OneLinkedList::searchStudentsBetweenDate(string start_date, string
     
     return result;
 }
-int OneLinkedList::countStudentsFree(string start_date, string end_date, string start_time, string end_time, string recomend_free) {
+
+int OneLinkedList::countStudentsFree(string start_date, string end_date, 
+                                   string start_time, string end_time, 
+                                   string recomend_free) {
     int count = 0;
     Node* current = head;
     
     while (current != NULL) {
         Student filteredStudent = current->data;
-        filteredStudent.visits.clear();
+        filteredStudent.clearVisits();
         
-        for (const Visits& visit : current->data.visits) {
-            if (visit.date_visit > start_date && 
-                visit.date_visit < end_date && visit.recomendations == recomend_free)
-                filteredStudent.visits.push_back(visit);   
-            if(visit.date_visit == start_date || visit.date_visit == end_date){
-                if(visit.time_visit > start_time && visit.time_visit < end_time && visit.diagnos == recomend_free)
-                    filteredStudent.visits.push_back(visit);
+        for (const Visits& visit : current->data.getVisits()) {
+            if (visit.getDateVisit() > start_date && 
+                visit.getDateVisit() < end_date && visit.getRecomendations() == recomend_free) {
+                filteredStudent.addVisit(visit);
+            }
+            if(visit.getDateVisit() == start_date || visit.getDateVisit() == end_date) {
+                if(visit.getTimeVisit() > start_time && visit.getTimeVisit() < end_time && 
+                   visit.getDiagnos() == recomend_free) {
+                    filteredStudent.addVisit(visit);
+                }
             }
         }
-        if (!filteredStudent.visits.empty()) {
+        if (!filteredStudent.getVisits().empty()) {
             count++;
         }
         
@@ -166,63 +178,61 @@ int OneLinkedList::countStudentsFree(string start_date, string end_date, string 
     return count;
 }
 
-void OneLinkedList::load_file(string filename){
+void OneLinkedList::load_file(string filename) {
     ifstream file(filename);
     if (!file.is_open()) {
         throw runtime_error("Невозможно открыть файл" + filename);
     }
     string line;
-    int count;
     Student student;
     Visits visits;
-    for(int i = 1;getline(file, line);i++){
-        if(i % 9 == 1){
-            student.lastname = line;
+    for(int i = 1; getline(file, line); i++) {
+        if(i % 9 == 1) {
+            student.setLastname(line);
         }
-        if(i % 9 == 2){
-            student.inicial = line;
+        if(i % 9 == 2) {
+            student.setInicial(line);
         }
-        if(i % 9 == 3){
-            student.date_born = stoi(line);
+        if(i % 9 == 3) {
+            student.setDateBorn(stoi(line));
         }
-        if(i % 9 == 4){
-            student.phone_number = line;
+        if(i % 9 == 4) {
+            student.setPhoneNumber(line);
         }
-        if(i % 9 == 5){
-            student.join_date = stoi(line);
+        if(i % 9 == 5) {
+            student.setJoinDate(stoi(line));
         }
-        if(i % 9 == 6){
-            student.group_name = line;
+        if(i % 9 == 6) {
+            student.setGroupName(line);
         }
-        if(i % 9 == 7){
-            student.university = line;
+        if(i % 9 == 7) {
+            student.setUniversity(line);
         }
-        if(i % 9 == 8){
-            student.cafedra  = line;
+        if(i % 9 == 8) {
+            student.setCafedra(line);
         }
-        if(i % 9 == 0){
+        if(i % 9 == 0) {
             vector<string> words = readLineAsStrings(line);
-            for(int j = 1; j < words.size();j++){
-                if(j % 6 == 1) visits.date_visit = words[j-1];
-                if(j % 6 == 2) visits.time_visit = words[j-1];
-                if(j % 6 == 3) visits.diagnos = words[j-1];
-                if(j % 6 == 4) visits.recomendations = words[j-1];
-                if(j % 6 == 5) visits.doctor_lastname = words[j-1];
-                if(j % 6 == 0){
-                    visits.doctor_inicial = words[j-1];
-                    student.visits.push_back(visits);
+            for(int j = 1; j < words.size(); j++) {
+                if(j % 6 == 1) visits.setDateVisit(words[j-1]);
+                if(j % 6 == 2) visits.setTimeVisit(words[j-1]);
+                if(j % 6 == 3) visits.setDiagnos(words[j-1]);
+                if(j % 6 == 4) visits.setRecomendations(words[j-1]);
+                if(j % 6 == 5) visits.setDoctorLastname(words[j-1]);
+                if(j % 6 == 0) {
+                    visits.setDoctorInicial(words[j-1]);
+                    student.addVisit(visits);
                 }
-                if(j == words.size() - 1){
-                    visits.doctor_inicial = words[j];
-                    student.visits.push_back(visits);
+                if(j == words.size() - 1) {
+                    visits.setDoctorInicial(words[j]);
+                    student.addVisit(visits);
                 }
             }
             push_back(student);
             student = Student();
             visits = Visits();
+        }
     }
-
-}
 }
 
 void OneLinkedList::push_backNnodes(int N) {
@@ -233,42 +243,44 @@ void OneLinkedList::push_backNnodes(int N) {
         Student obj;
         Visits visit;
         int k;
+        string temp_str;
+        int temp_int;
 
         cout << "Введите фамилию студента: ";
-        cin >> obj.lastname;
+        cin >> temp_str; obj.setLastname(temp_str);
         cout << "Введите инициалы студента: ";
-        cin >> obj.inicial;
+        cin >> temp_str; obj.setInicial(temp_str);
         cout << "Введите дату рождения (число): ";
-        cin >> obj.date_born;
+        cin >> temp_int; obj.setDateBorn(temp_int);
         cout << "Введите номер телефона: ";
-        cin >> obj.phone_number;
+        cin >> temp_str; obj.setPhoneNumber(temp_str);
         cout << "Введите дату зачисления (число): ";
-        cin >> obj.join_date;
+        cin >> temp_int; obj.setJoinDate(temp_int);
         cout << "Введите название группы: ";
-        cin >> obj.group_name;
+        cin >> temp_str; obj.setGroupName(temp_str);
         cout << "Введите университет: ";
-        cin >> obj.university;
+        cin >> temp_str; obj.setUniversity(temp_str);
         cout << "Введите кафедру: ";
-        cin >> obj.cafedra;
+        cin >> temp_str; obj.setCafedra(temp_str);
 
         cout << "Введите количество посещений, которые необходимо ввести: ";
         cin >> k;
 
         for (int j = 0; j < k; j++) {
             cout << "Введите дату посещения(формат YYYY.MM.DD): ";
-            cin >> visit.date_visit;
+            cin >> temp_str; visit.setDateVisit(temp_str);
             cout << "Введите время посещения(формат HH.MM): ";
-            cin >> visit.time_visit;
+            cin >> temp_str; visit.setTimeVisit(temp_str);
             cout << "Введите диагноз: ";
-            cin >> visit.diagnos;
+            cin >> temp_str; visit.setDiagnos(temp_str);
             cout << "Введите рекомендации: ";
-            cin >> visit.recomendations;
+            cin >> temp_str; visit.setRecomendations(temp_str);
             cout << "Введите фамилию врача: ";
-            cin >> visit.doctor_lastname;
+            cin >> temp_str; visit.setDoctorLastname(temp_str);
             cout << "Введите инициалы врача: ";
-            cin >> visit.doctor_inicial;
+            cin >> temp_str; visit.setDoctorInicial(temp_str);
 
-            obj.visits.push_back(visit);
+            obj.addVisit(visit);
         }
 
         push_back(obj);
@@ -282,33 +294,32 @@ void OneLinkedList::SaveToFile(string filename) {
     while (current != NULL) {
         Student& student = current->data;
 
-        // Запись основных данных студента
-        file << student.lastname << "\n";
-        file << student.inicial << "\n";
-        file << student.date_born << "\n";
-        file << student.phone_number << "\n";
-        file << student.join_date << "\n";
-        file << student.group_name << "\n";
-        file << student.university << "\n";
-        file << student.cafedra << "\n";
+        file << student.getLastname() << "\n";
+        file << student.getInicial() << "\n";
+        file << student.getDateBorn() << "\n";
+        file << student.getPhoneNumber() << "\n";
+        file << student.getJoinDate() << "\n";
+        file << student.getGroupName() << "\n";
+        file << student.getUniversity() << "\n";
+        file << student.getCafedra() << "\n";
 
-        // Запись данных о посещениях
-        for (const Visits& visit : student.visits) {
-            file << visit.date_visit << " ";
-            file << visit.time_visit << " ";
-            file << visit.diagnos << " ";
-            file << visit.recomendations << " ";
-            file << visit.doctor_lastname << " ";
-            file << visit.doctor_inicial << " ";
+        for (const Visits& visit : student.getVisits()) {
+            file << visit.getDateVisit() << " ";
+            file << visit.getTimeVisit() << " ";
+            file << visit.getDiagnos() << " ";
+            file << visit.getRecomendations() << " ";
+            file << visit.getDoctorLastname() << " ";
+            file << visit.getDoctorInicial() << " ";
         }
         file << endl;
         current = current->next;
     }
     file.close();
 }
+
 ostream& operator<<(ostream& os, OneLinkedList list) {
     setlocale(LC_ALL, "ru_RU.utf8");
-    Node* current = list.head;
+    Node* current = list.getHead();
     
     if (current == NULL) {
         os << "Список пуст!" << endl;
@@ -318,22 +329,22 @@ ostream& operator<<(ostream& os, OneLinkedList list) {
     while (current != NULL) {
         const Student& student = current->data;
         
-        os << "Фамилия: " << student.lastname << "\n"
-           << "Инициалы: " << student.inicial << "\n"
-           << "Дата рождения: " << student.date_born << "\n"
-           << "Телефон: " << student.phone_number << "\n"
-           << "Дата зачисления: " << student.join_date << "\n"
-           << "Группа: " << student.group_name << "\n"
-           << "Университет: " << student.university << "\n"
-           << "Кафедра: " << student.cafedra << "\n"
+        os << "Фамилия: " << student.getLastname() << "\n"
+           << "Инициалы: " << student.getInicial() << "\n"
+           << "Дата рождения: " << student.getDateBorn() << "\n"
+           << "Телефон: " << student.getPhoneNumber() << "\n"
+           << "Дата зачисления: " << student.getJoinDate() << "\n"
+           << "Группа: " << student.getGroupName() << "\n"
+           << "Университет: " << student.getUniversity() << "\n"
+           << "Кафедра: " << student.getCafedra() << "\n"
            << "Посещения:\n";
         
-        for (const Visits& visit : student.visits) {
-            os << "Дата посещения: " << visit.date_visit << " "
-               << "Время посещения: " << visit.time_visit << " "
-               << "Диагноз: " << visit.diagnos << " "
-               << "Рекомендации: " << visit.recomendations << " "
-               << "Врач: " << visit.doctor_lastname << " " << visit.doctor_inicial << "\n";
+        for (const Visits& visit : student.getVisits()) {
+            os << "Дата посещения: " << visit.getDateVisit() << " "
+               << "Время посещения: " << visit.getTimeVisit() << " "
+               << "Диагноз: " << visit.getDiagnos() << " "
+               << "Рекомендации: " << visit.getRecomendations() << " "
+               << "Врач: " << visit.getDoctorLastname() << " " << visit.getDoctorInicial() << "\n";
         }
         os << "\n=====================\n";
         current = current->next;
@@ -345,7 +356,7 @@ ostream& operator<<(ostream& os, OneLinkedList list) {
 bool OneLinkedList::updateStudentData(string student_id, Student new_data) {
     Node* current = head;
     while (current != NULL) {
-        if (current->data.phone_number == student_id) { 
+        if (current->data.getPhoneNumber() == student_id) { 
             current->data = new_data;
             return true;
         }
@@ -357,8 +368,8 @@ bool OneLinkedList::updateStudentData(string student_id, Student new_data) {
 bool OneLinkedList::addVisitToStudent(string student_id, Visits new_visit) {
     Node* current = head;
     while (current != NULL) {
-        if (current->data.phone_number == student_id) {
-            current->data.visits.push_back(new_visit);
+        if (current->data.getPhoneNumber() == student_id) {
+            current->data.addVisit(new_visit);
             return true;
         }
         current = current->next;
@@ -369,10 +380,10 @@ bool OneLinkedList::addVisitToStudent(string student_id, Visits new_visit) {
 bool OneLinkedList::removeVisitFromStudent(string student_id, string visit_date, string visit_time) {
     Node* current = head;
     while (current != NULL) {
-        if (current->data.phone_number == student_id) {
-            auto& visits = current->data.visits;
+        if (current->data.getPhoneNumber() == student_id) {
+            auto& visits = current->data.getVisits();
             for (auto it = visits.begin(); it != visits.end(); ++it) {
-                if (it->date_visit == visit_date && it->time_visit == visit_time) {
+                if (it->getDateVisit() == visit_date && it->getTimeVisit() == visit_time) {
                     visits.erase(it);
                     return true;
                 }
@@ -387,10 +398,10 @@ bool OneLinkedList::removeVisitFromStudent(string student_id, string visit_date,
 bool OneLinkedList::updateDiagnosis(string student_id, string visit_date, string visit_time, string new_diagnosis) {
     Node* current = head;
     while (current != NULL) {
-        if (current->data.phone_number == student_id) {
-            for (auto& visit : current->data.visits) {
-                if (visit.date_visit == visit_date && visit.time_visit == visit_time) {
-                    visit.diagnos = new_diagnosis;
+        if (current->data.getPhoneNumber() == student_id) {
+            for (auto& visit : current->data.getVisits()) {
+                if (visit.getDateVisit() == visit_date && visit.getTimeVisit() == visit_time) {
+                    visit.setDiagnos(new_diagnosis);
                     return true;
                 }
             }
@@ -404,10 +415,10 @@ bool OneLinkedList::updateDiagnosis(string student_id, string visit_date, string
 bool OneLinkedList::updateRecommendations(string student_id, string visit_date, string visit_time, string new_recommendations) {
     Node* current = head;
     while (current != NULL) {
-        if (current->data.phone_number == student_id) {
-            for (auto& visit : current->data.visits) {
-                if (visit.date_visit == visit_date && visit.time_visit == visit_time) {
-                    visit.recomendations = new_recommendations;
+        if (current->data.getPhoneNumber() == student_id) {
+            for (auto& visit : current->data.getVisits()) {
+                if (visit.getDateVisit() == visit_date && visit.getTimeVisit() == visit_time) {
+                    visit.setRecomendations(new_recommendations);
                     return true;
                 }
             }

@@ -39,6 +39,8 @@ int main() {
         Node* current;
         Student new_student;
         Visits new_visit;
+        string temp_str;
+        int temp_int;
         
         switch(choice) {
             case 1:
@@ -108,7 +110,7 @@ int main() {
                 current = list.getHead();
                 while(current != NULL){
                     Student new_student = current->data;
-                    if(new_student.phone_number == student_id){
+                    if(new_student.getPhoneNumber() == student_id){
                         check = true;
                         break;
                     }
@@ -129,14 +131,14 @@ int main() {
                 switch(choice) {
                     case 1: {
                         cout << "Введите новые данные студента:\n";
-                        cout << "Фамилия: "; cin >> new_student.lastname;
-                        cout << "Инициалы: "; cin >> new_student.inicial;
-                        cout << "Дата рождения: "; cin >> new_student.date_born;
-                        cout << "Номер телефона: "; cin >> new_student.phone_number;
-                        cout << "Дата зачисления: "; cin >> new_student.join_date;
-                        cout << "Группа: "; cin >> new_student.group_name;
-                        cout << "Университет: "; cin >> new_student.university;
-                        cout << "Кафедра: "; cin >> new_student.cafedra;
+                        cout << "Фамилия: "; cin >> temp_str; new_student.setLastname(temp_str);
+                        cout << "Инициалы: "; cin >> temp_str; new_student.setInicial(temp_str);
+                        cout << "Дата рождения: "; cin >> temp_int; new_student.setDateBorn(temp_int);
+                        cout << "Номер телефона: "; cin >> temp_str; new_student.setPhoneNumber(temp_str);
+                        cout << "Дата зачисления: "; cin >> temp_int; new_student.setJoinDate(temp_int);
+                        cout << "Группа: "; cin >> temp_str; new_student.setGroupName(temp_str);
+                        cout << "Университет: "; cin >> temp_str; new_student.setUniversity(temp_str);
+                        cout << "Кафедра: "; cin >> temp_str; new_student.setCafedra(temp_str);
                         
                         if(list.updateStudentData(student_id, new_student)) {
                             cout << "Данные студента обновлены!\n";
@@ -147,12 +149,12 @@ int main() {
                     }   
                     case 2: {
                         cout << "Введите данные посещения:\n";
-                        cout << "Дата посещения (ГГГГ.ММ.ДД): "; cin >> new_visit.date_visit;
-                        cout << "Время посещения (ЧЧ.ММ): "; cin >> new_visit.time_visit;
-                        cout << "Диагноз: "; cin >> new_visit.diagnos;
-                        cout << "Рекомендации: "; cin >> new_visit.recomendations;
-                        cout << "Фамилия врача: "; cin >> new_visit.doctor_lastname;
-                        cout << "Инициалы врача: "; cin >> new_visit.doctor_inicial;
+                        cout << "Дата посещения (ГГГГ.ММ.ДД): "; cin >> temp_str; new_visit.setDateVisit(temp_str);
+                        cout << "Время посещения (ЧЧ.ММ): "; cin >> temp_str; new_visit.setTimeVisit(temp_str);
+                        cout << "Диагноз: "; cin >> temp_str; new_visit.setDiagnos(temp_str);
+                        cout << "Рекомендации: "; cin >> temp_str; new_visit.setRecomendations(temp_str);
+                        cout << "Фамилия врача: "; cin >> temp_str; new_visit.setDoctorLastname(temp_str);
+                        cout << "Инициалы врача: "; cin >> temp_str; new_visit.setDoctorInicial(temp_str);
                         
                         if(list.addVisitToStudent(student_id, new_visit)) {
                             cout << "Посещение добавлено!\n";

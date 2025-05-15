@@ -18,15 +18,15 @@ vector<unsigned char> DESUtils::des_encrypt(const vector<unsigned char>& plainte
     memcpy(key_copy, key, sizeof(DES_cblock));
 
     if (DES_set_key_checked(&key_copy, &key_schedule)) {
-        cerr << "Weak key detected!" << endl;
+        cerr << "Обнаружен слабый ключ!" << endl;
         return {};
     }
-    size_t pad_len = 8 - (plaintext.size() % 8);
+    int pad_len = 8 - (plaintext.size() % 8);
     vector<unsigned char> padded(plaintext);
     padded.insert(padded.end(), pad_len, static_cast<unsigned char>(pad_len));
 
     vector<unsigned char> ciphertext(padded.size());
-    for (size_t i = 0; i < padded.size(); i += 8) {
+    for (int i = 0; i < padded.size(); i += 8) {
         DES_ecb_encrypt(
             reinterpret_cast<const_DES_cblock*>(&padded[i]),
             reinterpret_cast<DES_cblock*>(&ciphertext[i]),
@@ -40,25 +40,23 @@ vector<unsigned char> DESUtils::des_encrypt(const vector<unsigned char>& plainte
 
 vector<unsigned char> DESUtils::des_decrypt(const vector<unsigned char>& ciphertext, const DES_cblock& key) {
     if (ciphertext.size() % 8 != 0) {
-        cerr << "Invalid ciphertext size (must be multiple of 8)" << endl;
+        cerr << "Некорректный размер шифротекста (должен быть кратен 8)" << endl;
         return {};
     }
 
     DES_key_schedule key_schedule;
     
-    // Копируем ключ
     DES_cblock key_copy;
     memcpy(key_copy, key, sizeof(DES_cblock));
     
-    // Устанавливаем ключ
     if (DES_set_key_checked(&key_copy, &key_schedule)) {
-        cerr << "Weak key detected!" << endl;
+        cerr << "Обнаружен слабый ключ!" << endl;
         return {};
     }
 
     vector<unsigned char> plaintext(ciphertext.size());
 
-    for (size_t i = 0; i < ciphertext.size(); i += 8) {
+    for (int i = 0; i < ciphertext.size(); i += 8) {
         DES_cblock input_block, output_block;
         memcpy(&input_block, &ciphertext[i], 8);
         
@@ -69,11 +67,9 @@ vector<unsigned char> DESUtils::des_decrypt(const vector<unsigned char>& ciphert
             DES_DECRYPT
         );
         
-        // Копируем результат обратно в вектор
         memcpy(&plaintext[i], &output_block, 8);
     }
-    // Удаляем padding PKCS#7
-    size_t pad_len = plaintext.back();
+    int pad_len = plaintext.back();
     if (pad_len > 0 && pad_len <= 8) {
         plaintext.resize(plaintext.size() - pad_len);
     }
@@ -118,7 +114,7 @@ vector<unsigned char> DESUtils::base64_decode(const string& encoded) {
 bool DESUtils::encrypt_file(const string& input_file, const string& output_file, const DES_cblock& key) {
     ifstream in(input_file, ios::binary);
     if (!in) {
-        cerr << "Cannot open input file: " << input_file << endl;
+        cerr << "Не удалось открыть входной файл: " << input_file << endl;
         return false;
     }
 
@@ -134,7 +130,7 @@ bool DESUtils::encrypt_file(const string& input_file, const string& output_file,
 
     ofstream out(output_file);
     if (!out) {
-        cerr << "Cannot open output file: " << output_file << endl;
+        cerr << "Не удалось открыть выходной файл: " << output_file << endl;
         return false;
     }
 
@@ -147,7 +143,7 @@ bool DESUtils::encrypt_file(const string& input_file, const string& output_file,
 bool DESUtils::decrypt_file(const string& input_file, const string& output_file, const DES_cblock& key) {
     ifstream in(input_file);
     if (!in) {
-        cerr << "Cannot open input file: " << input_file << endl;
+        cerr << "Не удалось открыть входной файл: " << input_file << endl;
         return false;
     }
 
@@ -162,7 +158,7 @@ bool DESUtils::decrypt_file(const string& input_file, const string& output_file,
 
     ofstream out(output_file, ios::binary);
     if (!out) {
-        cerr << "Cannot open output file: " << output_file << endl;
+        cerr << "Не удалось открыть выходной файл: " << output_file << endl;
         return false;
     }
 
@@ -175,11 +171,11 @@ bool DESUtils::decrypt_file(const string& input_file, const string& output_file,
 
 void DESUtils::generate_random_key(DES_cblock* key) {
     if (!key) {
-        throw std::invalid_argument("Key pointer is null");
+        throw invalid_argument("Указатель на ключ равен nullptr");
     }
     
     if (RAND_bytes(*key, sizeof(DES_cblock)) != 1) {
-        throw std::runtime_error("Ошибка генерации ключа");
+        throw runtime_error("Ошибка генерации ключа");
     }
     
     for (auto& byte : *key) {

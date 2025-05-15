@@ -127,9 +127,7 @@ OneLinkedList OneLinkedList::searchStudentsDate(string date) {
     return result;
 }
 
-OneLinkedList OneLinkedList::searchStudentsBetweenDate(string start_date, string end_date, 
-                                                     string start_time, string end_time, 
-                                                     string diagnos_search) {
+OneLinkedList OneLinkedList::searchStudentsBetweenDate(string start_date, string end_date, string start_time, string end_time, string diagnos_search) {
     OneLinkedList result;
     Node* current = head;
     
@@ -160,9 +158,7 @@ OneLinkedList OneLinkedList::searchStudentsBetweenDate(string start_date, string
     return result;
 }
 
-int OneLinkedList::countStudentsFree(string start_date, string end_date, 
-                                   string start_time, string end_time, 
-                                   string recomend_free) {
+int OneLinkedList::countStudentsFree(string start_date, string end_date, string start_time, string end_time, string recomend_free) {
     int count = 0;
     Node* current = head;
     
@@ -254,7 +250,7 @@ void OneLinkedList::push_backNnodes(int N) {
         return;
     }
 
-    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Очистка буфера ввода
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     for (int i = 0; i < N; i++) {
         cout << "\n=== Ввод данных студента " << i + 1 << " из " << N << " ===" << endl;
@@ -266,7 +262,6 @@ void OneLinkedList::push_backNnodes(int N) {
         int visitCount = 0;
 
         try {
-            // Ввод и валидация основных данных студента
             cout << "Фамилия: ";
             getline(cin, input);
             if (input.empty()) throw invalid_argument("Фамилия не может быть пустой");
@@ -353,7 +348,6 @@ void OneLinkedList::push_backNnodes(int N) {
                 newStudent.addVisit(newVisit);
             }
 
-            // Добавление валидированного студента в список
             push_back(newStudent);
             cout << "Студент успешно добавлен!" << endl;
 
@@ -361,7 +355,7 @@ void OneLinkedList::push_backNnodes(int N) {
             cerr << "Ошибка ввода данных: " << e.what() << endl;
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            i--; // Повторяем ввод для этого студента
+            i--;
         } catch (exception& e) {
             cerr << "Неожиданная ошибка: " << e.what() << endl;
             return;

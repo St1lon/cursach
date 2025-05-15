@@ -91,7 +91,7 @@ public:
         if (group_name.empty()) throw invalid_argument("Название группы не может быть пустым");
         if (university.empty()) throw invalid_argument("Название университета не может быть пустым");
         if (cafedra.empty()) throw invalid_argument("Название кафедры не может быть пустым");
-        for (const auto& visit : visits) {
+        for (auto& visit : visits) {
             visit.validateVisitData();
         }
     }

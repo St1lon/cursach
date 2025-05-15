@@ -62,7 +62,21 @@ int main() {
             case 4:
                 cout << "Введите количество студентов: ";
                 cin >> count;
-                if(count == 0) break;
+                
+                if(cin.fail()) {
+                    cout << "Ошибка - должно быть введено число\n";
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    system("pause");
+                    break;
+                }
+                
+                if(count <= 0) {
+                    cout << "Ошибка - число должно быть больше 0\n";
+                    system("pause");
+                    break;
+                }
+                
                 list.push_backNnodes(count);
                 cout << "Студенты добавлены\n";
                 system("pause");

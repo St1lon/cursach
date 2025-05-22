@@ -220,4 +220,118 @@ void des_menu() {
             }
         }
     }
+
+}
+
+void handleStudentInput(Student& student) {
+    string temp_str;
+    int temp_int;
+    cout << "Фамилия: ";
+    getline(cin >> ws, temp_str);
+    if (temp_str.empty()) {
+        throw invalid_argument("Фамилия не может быть пустой");
+    }
+    student.setLastname(temp_str);
+
+    cout << "Инициалы: ";
+    getline(cin, temp_str);
+    if (temp_str.empty()) {
+        throw invalid_argument("Инициалы не могут быть пустыми");
+    }
+    student.setInicial(temp_str);
+    cout << "Дата рождения: ";
+    if (!(cin >> temp_int)) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        throw invalid_argument("Дата рождения должна быть числом");
+    }
+    if (temp_int <= 0) {
+        throw invalid_argument("Дата рождения должна быть положительным числом");
+    }
+    student.setDateBorn(temp_int);
+    cin.ignore();
+    cout << "Номер телефона: ";
+    getline(cin, temp_str);
+    if (temp_str.empty()) {
+        throw invalid_argument("Номер телефона не может быть пустым");
+    }
+    if (temp_str.find_first_not_of("0123456789+()- ") != string::npos) {
+        throw invalid_argument("Номер телефона содержит недопустимые символы");
+    }
+    student.setPhoneNumber(temp_str);
+    cout << "Дата зачисления: ";
+    if (!(cin >> temp_int)) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        throw invalid_argument("Дата зачисления должна быть числом");
+    }
+    if (temp_int <= 0) {
+        throw invalid_argument("Дата зачисления должна быть положительным числом");
+    }
+    student.setJoinDate(temp_int);
+    cin.ignore();
+    cout << "Группа: ";
+    getline(cin, temp_str);
+    if (temp_str.empty()) {
+        throw invalid_argument("Название группы не может быть пустым");
+    }
+    student.setGroupName(temp_str);
+    cout << "Университет: ";
+    getline(cin, temp_str);
+    if (temp_str.empty()) {
+        throw invalid_argument("Название университета не может быть пустым");
+    }
+    student.setUniversity(temp_str);
+    cout << "Кафедра: ";
+    getline(cin, temp_str);
+    if (temp_str.empty()) {
+        throw invalid_argument("Название кафедры не может быть пустым");
+    }
+    student.setCafedra(temp_str);
+}
+
+void handleVisitInput(Visits& visit) {
+    string temp_str;
+    cout << "Дата посещения (ГГГГ.ММ.ДД): ";
+    getline(cin >> ws, temp_str);
+    if (temp_str.empty()) {
+        throw invalid_argument("Дата посещения не может быть пустой");
+    }
+    if (temp_str.length() != 10 || temp_str[4] != '.' || temp_str[7] != '.') {
+        throw invalid_argument("Неверный формат даты. Используйте ГГГГ.ММ.ДД");
+    }
+    visit.setDateVisit(temp_str);
+    cout << "Время посещения (ЧЧ.ММ): ";
+    getline(cin, temp_str);
+    if (temp_str.empty()) {
+        throw invalid_argument("Время посещения не может быть пустым");
+    }
+    if (temp_str.length() != 5 || temp_str[2] != '.') {
+        throw invalid_argument("Неверный формат времени. Используйте ЧЧ.ММ");
+    }
+    visit.setTimeVisit(temp_str);
+    cout << "Диагноз: ";
+    getline(cin, temp_str);
+    if (temp_str.empty()) {
+        throw invalid_argument("Диагноз не может быть пустым");
+    }
+    visit.setDiagnos(temp_str);
+    cout << "Рекомендации: ";
+    getline(cin, temp_str);
+    if (temp_str.empty()) {
+        throw invalid_argument("Рекомендации не могут быть пустыми");
+    }
+    visit.setRecomendations(temp_str);
+    cout << "Фамилия врача: ";
+    getline(cin, temp_str);
+    if (temp_str.empty()) {
+        throw invalid_argument("Фамилия врача не может быть пустой");
+    }
+    visit.setDoctorLastname(temp_str);
+    cout << "Инициалы врача: ";
+    getline(cin, temp_str);
+    if (temp_str.empty()) {
+        throw invalid_argument("Инициалы врача не могут быть пустыми");
+    }
+    visit.setDoctorInicial(temp_str);
 }

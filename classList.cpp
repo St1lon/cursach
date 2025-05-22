@@ -6,6 +6,7 @@
 #include <sstream>
 #include "classList.h"
 #include "func.h"
+#include <iomanip>
 using namespace std;
 
 Node::Node(Student data) {
@@ -395,37 +396,107 @@ void OneLinkedList::SaveToFile(string filename) {
 
 ostream& operator<<(ostream& os, OneLinkedList list) {
     setlocale(LC_ALL, "ru_RU.utf8");
-    Node* current = list.getHead();
     
-    if (current == NULL) {
+    // Фиксированные ширины столбцов
+    const int lastname_width = 12;
+    const int initials_width = 10;
+    const int birth_width = 12;
+    const int phone_width = 15;
+    const int enroll_width = 12;
+    const int group_width = 10;
+    const int uni_width = 15;
+    const int dept_width = 10;
+    const int visits_width = 25;
+
+    // Функция вывода разделительной линии
+    auto print_line = [&]() {
+        os << "+" << string(lastname_width+2, '-')
+           << "+" << string(initials_width+2, '-')
+           << "+" << string(birth_width+2, '-')
+           << "+" << string(phone_width+2, '-')
+           << "+" << string(enroll_width+2, '-')
+           << "+" << string(group_width+2, '-')
+           << "+" << string(uni_width+2, '-')
+           << "+" << string(dept_width+2, '-')
+           << "+" << string(visits_width+2, '-')
+           << "+" << endl;
+    };
+
+    Node* current = list.getHead();
+    if (!current) {
         os << "Список пуст!" << endl;
         return os;
     }
-    
-    while (current != NULL) {
+
+    // Шапка таблицы
+    print_line();
+    os << "| " << left << setw(lastname_width) << "Фамилия"
+       << " | " << setw(initials_width) << "Инициалы"
+       << " | " << setw(birth_width) << "Дата рожд."
+       << " | " << setw(phone_width) << "Телефон"
+       << " | " << setw(enroll_width) << "Дата зач."
+       << " | " << setw(group_width) << "Группа"
+       << " | " << setw(uni_width) << "Университет"
+       << " | " << setw(dept_width) << "Кафедра"
+       << " | " << setw(visits_width) << "Посещения"
+       << " |" << endl;
+    print_line();
+
+    while (current) {
         const Student& student = current->data;
-        
-        os << "Фамилия: " << student.getLastname() << "\n"
-           << "Инициалы: " << student.getInicial() << "\n"
-           << "Дата рождения: " << student.getDateBorn() << "\n"
-           << "Телефон: " << student.getPhoneNumber() << "\n"
-           << "Дата зачисления: " << student.getJoinDate() << "\n"
-           << "Группа: " << student.getGroupName() << "\n"
-           << "Университет: " << student.getUniversity() << "\n"
-           << "Кафедра: " << student.getCafedra() << "\n"
-           << "Посещения:\n";
-        
-        for (const Visits& visit : student.getVisits()) {
-            os << "Дата посещения: " << visit.getDateVisit() << " "
-               << "Время посещения: " << visit.getTimeVisit() << " "
-               << "Диагноз: " << visit.getDiagnos() << " "
-               << "Рекомендации: " << visit.getRecomendations() << " "
-               << "Врач: " << visit.getDoctorLastname() << " " << visit.getDoctorInicial() << "\n";
+        const auto& visits = student.getVisits();
+
+        // Основная строка с данными студента
+        os << "| " << left << setw(lastname_width) << student.getLastname().substr(0, lastname_width)
+           << " | " << setw(initials_width) << student.getInicial().substr(0, initials_width)
+           << " | " << setw(birth_width) << student.getDateBorn()
+           << " | " << setw(phone_width) << student.getPhoneNumber().substr(0, phone_width)
+           << " | " << setw(enroll_width) << student.getJoinDate()
+           << " | " << setw(group_width) << student.getGroupName().substr(0, group_width)
+           << " | " << setw(uni_width) << student.getUniversity().substr(0, uni_width)
+           << " | " << setw(dept_width) << student.getCafedra().substr(0, dept_width)
+           << " | ";
+
+        // Первое посещение (если есть)
+        if (!visits.empty()) {
+            os << setw(visits_width) << (visits[0].getDateVisit() + " " + visits[0].getTimeVisit()).substr(0, visits_width);
+        } else {
+            os << setw(visits_width) << "Нет";
         }
-        os << "\n=====================\n";
+        os << " |" << endl;
+
+        // Дополнительные строки с посещениями
+        for (size_t i = 1; i < visits.size(); i++) {
+            os << "| " << string(lastname_width, ' ')
+               << " | " << string(initials_width, ' ')
+               << " | " << string(birth_width, ' ')
+               << " | " << string(phone_width, ' ')
+               << " | " << string(enroll_width, ' ')
+               << " | " << string(group_width, ' ')
+               << " | " << string(uni_width, ' ')
+               << " | " << string(dept_width, ' ')
+               << " | " << setw(visits_width) << (visits[i].getDateVisit() + " " + visits[i].getTimeVisit()).substr(0, visits_width)
+               << " |" << endl;
+        }
+
+        // Строки с диагнозами
+        for (size_t i = 0; i < visits.size(); i++) {
+            os << "| " << string(lastname_width, ' ')
+               << " | " << string(initials_width, ' ')
+               << " | " << string(birth_width, ' ')
+               << " | " << string(phone_width, ' ')
+               << " | " << string(enroll_width, ' ')
+               << " | " << string(group_width, ' ')
+               << " | " << string(uni_width, ' ')
+               << " | " << string(dept_width, ' ')
+               << " | " << setw(visits_width) << ("Диагноз: " + visits[i].getDiagnos()).substr(0, visits_width)
+               << " |" << endl;
+        }
+
+        print_line();
         current = current->next;
     }
-    
+
     return os;
 }
 

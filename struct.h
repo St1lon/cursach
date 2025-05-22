@@ -29,7 +29,6 @@ public:
         if (phone_number.empty()) throw invalid_argument("Номер телефона не может быть пустым");
     }
 };
-
 class Visits {
     string date_visit;
     string time_visit;

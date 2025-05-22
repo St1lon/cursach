@@ -17,5 +17,7 @@ string readFile(const string& filename);
 void writeFile(const string& filename, const string& content);
 void ShowFile(const string& filename);
 void des_menu();
+void handleStudentInput(Student& student);
+void handleVisitInput(Visits& visit);
 
 #endif

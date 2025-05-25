@@ -42,5 +42,6 @@ class Node{
         bool removeVisitFromStudent(string student_id, string visit_date, string visit_time);
         bool updateDiagnosis(string student_id, string visit_date, string visit_time, string new_diagnosis);
         bool updateRecommendations(string student_id, string visit_date, string visit_time, string new_recommendations);
+        bool containsPhoneNumber(const string& phoneNumber) const;
     };
 #endif

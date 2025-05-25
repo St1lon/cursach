@@ -94,6 +94,9 @@ void OneLinkedList::push_front(Student data) {
 void OneLinkedList::push_back(Student data) {
     try {
         data.validateStudentData();
+        if (containsPhoneNumber(data.getPhoneNumber())) {
+            throw invalid_argument("Студент с таким номером телефона уже существует");
+        }
         Node* node = new Node(data);
         if(head == NULL) head = node;
         if(tail != NULL) tail->next = node;
@@ -103,7 +106,6 @@ void OneLinkedList::push_back(Student data) {
         throw;
     }
 }
-
 OneLinkedList OneLinkedList::searchStudentsDate(string date) {
     OneLinkedList result;
     Node* current = head;
@@ -396,29 +398,29 @@ void OneLinkedList::SaveToFile(string filename) {
 
 ostream& operator<<(ostream& os, OneLinkedList list) {
     setlocale(LC_ALL, "ru_RU.utf8");
-    
-    // Фиксированные ширины столбцов
-    const int lastname_width = 12;
-    const int initials_width = 10;
-    const int birth_width = 12;
-    const int phone_width = 15;
-    const int enroll_width = 12;
-    const int group_width = 10;
-    const int uni_width = 15;
-    const int dept_width = 10;
-    const int visits_width = 25;
 
-    // Функция вывода разделительной линии
+    // Ширины столбцов (увеличил для полных данных)
+    const int col1 = 15; // Фамилия
+    const int col2 = 10; // Инициалы
+    const int col3 = 12; // Дата рождения
+    const int col4 = 17; // Телефон
+    const int col5 = 12; // Дата зачисления
+    const int col6 = 12; // Группа
+    const int col7 = 15; // Университет
+    const int col8 = 20; // Кафедра
+    const int col9 = 30; // Посещения (увеличил для полных данных)
+
+    // Функция для вывода горизонтальной линии
     auto print_line = [&]() {
-        os << "+" << string(lastname_width+2, '-')
-           << "+" << string(initials_width+2, '-')
-           << "+" << string(birth_width+2, '-')
-           << "+" << string(phone_width+2, '-')
-           << "+" << string(enroll_width+2, '-')
-           << "+" << string(group_width+2, '-')
-           << "+" << string(uni_width+2, '-')
-           << "+" << string(dept_width+2, '-')
-           << "+" << string(visits_width+2, '-')
+        os << "+" << string(col1, '-')
+           << "+" << string(col2, '-')
+           << "+" << string(col3, '-')
+           << "+" << string(col4, '-')
+           << "+" << string(col5, '-')
+           << "+" << string(col6, '-')
+           << "+" << string(col7, '-')
+           << "+" << string(col8, '-')
+           << "+" << string(col9, '-')
            << "+" << endl;
     };
 
@@ -430,69 +432,115 @@ ostream& operator<<(ostream& os, OneLinkedList list) {
 
     // Шапка таблицы
     print_line();
-    os << "| " << left << setw(lastname_width) << "Фамилия"
-       << " | " << setw(initials_width) << "Инициалы"
-       << " | " << setw(birth_width) << "Дата рожд."
-       << " | " << setw(phone_width) << "Телефон"
-       << " | " << setw(enroll_width) << "Дата зач."
-       << " | " << setw(group_width) << "Группа"
-       << " | " << setw(uni_width) << "Университет"
-       << " | " << setw(dept_width) << "Кафедра"
-       << " | " << setw(visits_width) << "Посещения"
-       << " |" << endl;
+    os << "| " << left << setw(col1-1) << "Фамилия" << " | "
+       << setw(col2-1) << "Инициалы" << " | "
+       << setw(col3-1) << "Рождение" << " | "
+       << setw(col4+2) << "Телефон" << " | "
+       << setw(col5-1) << "Зачислен" << " | "
+       << setw(col6+4) << "Группа" << " | "
+       << setw(col7-1) << "Университет" << " | "
+       << setw(col8+5) << "Кафедра" << " | "
+       << setw(col9-1) << "Посещения" << " |" << endl;
     print_line();
 
     while (current) {
         const Student& student = current->data;
         const auto& visits = student.getVisits();
 
-        // Основная строка с данными студента
-        os << "| " << left << setw(lastname_width) << student.getLastname().substr(0, lastname_width)
-           << " | " << setw(initials_width) << student.getInicial().substr(0, initials_width)
-           << " | " << setw(birth_width) << student.getDateBorn()
-           << " | " << setw(phone_width) << student.getPhoneNumber().substr(0, phone_width)
-           << " | " << setw(enroll_width) << student.getJoinDate()
-           << " | " << setw(group_width) << student.getGroupName().substr(0, group_width)
-           << " | " << setw(uni_width) << student.getUniversity().substr(0, uni_width)
-           << " | " << setw(dept_width) << student.getCafedra().substr(0, dept_width)
-           << " | ";
+        // Основные данные студента
+        os << "| " << left << setw(col1-1) << student.getLastname() << " | "
+           << setw(col2-1) << student.getInicial() << " | "
+           << setw(col3-4) << student.getDateBorn() << " | "
+           << setw(col4-4) << student.getPhoneNumber() << " | "
+           << setw(col5-4) << student.getJoinDate() << " | "
+           << setw(col6-1) << student.getGroupName() << " | "
+           << setw(col7) << student.getUniversity() << " | "
+           << setw(col8-1) << student.getCafedra() << " | ";
 
-        // Первое посещение (если есть)
-        if (!visits.empty()) {
-            os << setw(visits_width) << (visits[0].getDateVisit() + " " + visits[0].getTimeVisit()).substr(0, visits_width);
+        // Информация о посещениях
+        if (visits.empty()) {
+            os << setw(col9-1) << "Нет посещений" << " |" << endl;
         } else {
-            os << setw(visits_width) << "Нет";
-        }
-        os << " |" << endl;
+            // Первое посещение в основной строке
+            const Visits& first = visits[0];
+            os << first.getDateVisit() << " " << first.getTimeVisit();
+            // Заполняем оставшееся пространство, если время посещения короткое
+            int space_left = col9 - 1 - (first.getDateVisit().length() + first.getTimeVisit().length() + 1);
+            if (space_left > 0) os << string(space_left, ' ');
+            os << " |" << endl;
 
-        // Дополнительные строки с посещениями
-        for (size_t i = 1; i < visits.size(); i++) {
-            os << "| " << string(lastname_width, ' ')
-               << " | " << string(initials_width, ' ')
-               << " | " << string(birth_width, ' ')
-               << " | " << string(phone_width, ' ')
-               << " | " << string(enroll_width, ' ')
-               << " | " << string(group_width, ' ')
-               << " | " << string(uni_width, ' ')
-               << " | " << string(dept_width, ' ')
-               << " | " << setw(visits_width) << (visits[i].getDateVisit() + " " + visits[i].getTimeVisit()).substr(0, visits_width)
-               << " |" << endl;
-        }
+            // Дополнительные строки для подробностей посещений
+            for (size_t i = 0; i < visits.size(); i++) {
+                const Visits& visit = visits[i];
+                
+                // Для последующих посещений выводим время
+                if (i > 0) {
+                    os << "| " << string(col1-1, ' ') << " | "
+                       << string(col2-1, ' ') << " | "
+                       << string(col3-1, ' ') << " | "
+                       << string(col4-1, ' ') << " | "
+                       << string(col5-1, ' ') << " | "
+                       << string(col6-1, ' ') << " | "
+                       << string(col7-1, ' ') << " | "
+                       << string(col8-1, ' ') << " | "
+                       << visit.getDateVisit() << " " << visit.getTimeVisit();
+                    
+                    space_left = col9 - 1 - (visit.getDateVisit().length() + visit.getTimeVisit().length() + 1);
+                    if (space_left > 0) os << string(space_left, ' ');
+                    os << " |" << endl;
+                }
 
-        // Строки с диагнозами
-        for (size_t i = 0; i < visits.size(); i++) {
-            os << "| " << string(lastname_width, ' ')
-               << " | " << string(initials_width, ' ')
-               << " | " << string(birth_width, ' ')
-               << " | " << string(phone_width, ' ')
-               << " | " << string(enroll_width, ' ')
-               << " | " << string(group_width, ' ')
-               << " | " << string(uni_width, ' ')
-               << " | " << string(dept_width, ' ')
-               << " | " << setw(visits_width) << ("Диагноз: " + visits[i].getDiagnos()).substr(0, visits_width)
-               << " |" << endl;
-        }
+                // Выводим диагноз
+                os << "| " << string(col1-1, ' ') << " | "
+                   << string(col2-1, ' ') << " | "
+                   << string(col3-1, ' ') << " | "
+                   << string(col4-1, ' ') << " | "
+                   << string(col5-1, ' ') << " | "
+                   << string(col6-1, ' ') << " | "
+                   << string(col7-1, ' ') << " | "
+                   << string(col8-1, ' ') << " | "
+                   << "Диагноз: " << visit.getDiagnos();
+                
+                space_left = col9 - 1 - (8 + visit.getDiagnos().length());
+                if (space_left > 0) os << string(space_left, ' ');
+                os << " |" << endl;
 
+                // Выводим рекомендации
+                os << "| " << string(col1-1, ' ') << " | "
+                   << string(col2-1, ' ') << " | "
+                   << string(col3-1, ' ') << " | "
+                   << string(col4-1, ' ') << " | "
+                   << string(col5-1, ' ') << " | "
+                   << string(col6-1, ' ') << " | "
+                   << string(col7-1, ' ') << " | "
+                   << string(col8-1, ' ') << " | "
+                   << "Рекомендации: " << visit.getRecomendations();
+                
+                space_left = col9 - 1 - (13 + visit.getRecomendations().length());
+                if (space_left > 0) os << string(space_left, ' ');
+                os << " |" << endl;
+
+                // Выводим врача
+                os << "| " << string(col1-1, ' ') << " | "
+                   << string(col2-1, ' ') << " | "
+                   << string(col3-1, ' ') << " | "
+                   << string(col4-1, ' ') << " | "
+                   << string(col5-1, ' ') << " | "
+                   << string(col6-1, ' ') << " | "
+                   << string(col7-1, ' ') << " | "
+                   << string(col8-1, ' ') << " | "
+                   << "Врач: " << visit.getDoctorLastname() << " " << visit.getDoctorInicial();
+                
+                space_left = col9 - 1 - (6 + visit.getDoctorLastname().length() + visit.getDoctorInicial().length() + 1);
+                if (space_left > 0) os << string(space_left, ' ');
+                os << " |" << endl;
+
+                // Разделитель между посещениями
+                if (i < visits.size() - 1) {
+                    print_line();
+                }
+            }
+        }
         print_line();
         current = current->next;
     }
@@ -503,6 +551,10 @@ ostream& operator<<(ostream& os, OneLinkedList list) {
 bool OneLinkedList::updateStudentData(string student_id, Student new_data) {
     try {
         new_data.validateStudentData();
+        if (new_data.getPhoneNumber() != student_id && containsPhoneNumber(new_data.getPhoneNumber())) {
+            throw invalid_argument("Студент с таким номером телефона уже существует");
+        }
+        
         Node* current = head;
         while (current != NULL) {
             if (current->data.getPhoneNumber() == student_id) { 
@@ -582,6 +634,16 @@ bool OneLinkedList::updateRecommendations(string student_id, string visit_date, 
                 }
             }
             return false;
+        }
+        current = current->next;
+    }
+    return false;
+}
+bool OneLinkedList::containsPhoneNumber(const string& phoneNumber) const {
+    Node* current = head;
+    while (current != NULL) {
+        if (current->data.getPhoneNumber() == phoneNumber) {
+            return true;
         }
         current = current->next;
     }

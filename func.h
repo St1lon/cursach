@@ -11,7 +11,7 @@
 #include <limits>
 using namespace std; 
 
-vector<std::string> readLineAsStrings(string line);
+vector<string> readLineAsStrings(string line);
 void clear_key(DES_cblock& key);
 string readFile(const string& filename);
 void writeFile(const string& filename, const string& content);

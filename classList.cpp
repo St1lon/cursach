@@ -446,8 +446,7 @@ ostream& operator<<(ostream& os, OneLinkedList list) {
     while (current) {
         const Student& student = current->data;
         const auto& visits = student.getVisits();
-
-        // Основные данные студента
+        
         os << "| " << left << setw(col1-1) << student.getLastname() << " | "
            << setw(col2-1) << student.getInicial() << " | "
            << setw(col3-4) << student.getDateBorn() << " | "
@@ -457,23 +456,19 @@ ostream& operator<<(ostream& os, OneLinkedList list) {
            << setw(col7) << student.getUniversity() << " | "
            << setw(col8-1) << student.getCafedra() << " | ";
 
-        // Информация о посещениях
         if (visits.empty()) {
             os << setw(col9-1) << "Нет посещений" << " |" << endl;
         } else {
-            // Первое посещение в основной строке
             const Visits& first = visits[0];
             os << first.getDateVisit() << " " << first.getTimeVisit();
-            // Заполняем оставшееся пространство, если время посещения короткое
+
             int space_left = col9 - 1 - (first.getDateVisit().length() + first.getTimeVisit().length() + 1);
             if (space_left > 0) os << string(space_left, ' ');
             os << " |" << endl;
 
-            // Дополнительные строки для подробностей посещений
             for (size_t i = 0; i < visits.size(); i++) {
                 const Visits& visit = visits[i];
                 
-                // Для последующих посещений выводим время
                 if (i > 0) {
                     os << "| " << string(col1-1, ' ') << " | "
                        << string(col2-1, ' ') << " | "
@@ -490,7 +485,6 @@ ostream& operator<<(ostream& os, OneLinkedList list) {
                     os << " |" << endl;
                 }
 
-                // Выводим диагноз
                 os << "| " << string(col1-1, ' ') << " | "
                    << string(col2-1, ' ') << " | "
                    << string(col3-1, ' ') << " | "
@@ -505,7 +499,6 @@ ostream& operator<<(ostream& os, OneLinkedList list) {
                 if (space_left > 0) os << string(space_left, ' ');
                 os << " |" << endl;
 
-                // Выводим рекомендации
                 os << "| " << string(col1-1, ' ') << " | "
                    << string(col2-1, ' ') << " | "
                    << string(col3-1, ' ') << " | "
@@ -519,8 +512,6 @@ ostream& operator<<(ostream& os, OneLinkedList list) {
                 space_left = col9 - 1 - (13 + visit.getRecomendations().length());
                 if (space_left > 0) os << string(space_left, ' ');
                 os << " |" << endl;
-
-                // Выводим врача
                 os << "| " << string(col1-1, ' ') << " | "
                    << string(col2-1, ' ') << " | "
                    << string(col3-1, ' ') << " | "
@@ -535,7 +526,6 @@ ostream& operator<<(ostream& os, OneLinkedList list) {
                 if (space_left > 0) os << string(space_left, ' ');
                 os << " |" << endl;
 
-                // Разделитель между посещениями
                 if (i < visits.size() - 1) {
                     print_line();
                 }

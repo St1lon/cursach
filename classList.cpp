@@ -399,18 +399,16 @@ void OneLinkedList::SaveToFile(string filename) {
 ostream& operator<<(ostream& os, OneLinkedList list) {
     setlocale(LC_ALL, "ru_RU.utf8");
 
-    // Ширины столбцов (увеличил для полных данных)
-    const int col1 = 15; // Фамилия
-    const int col2 = 10; // Инициалы
-    const int col3 = 12; // Дата рождения
-    const int col4 = 17; // Телефон
-    const int col5 = 12; // Дата зачисления
-    const int col6 = 12; // Группа
-    const int col7 = 15; // Университет
-    const int col8 = 20; // Кафедра
-    const int col9 = 30; // Посещения (увеличил для полных данных)
+    const int col1 = 15; 
+    const int col2 = 10; 
+    const int col3 = 12; 
+    const int col4 = 17;
+    const int col5 = 12;
+    const int col6 = 12; 
+    const int col7 = 15;
+    const int col8 = 20; 
+    const int col9 = 30; 
 
-    // Функция для вывода горизонтальной линии
     auto print_line = [&]() {
         os << "+" << string(col1, '-')
            << "+" << string(col2, '-')
@@ -430,7 +428,6 @@ ostream& operator<<(ostream& os, OneLinkedList list) {
         return os;
     }
 
-    // Шапка таблицы
     print_line();
     os << "| " << left << setw(col1-1) << "Фамилия" << " | "
        << setw(col2-1) << "Инициалы" << " | "
